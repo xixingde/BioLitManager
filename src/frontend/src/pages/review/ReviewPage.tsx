@@ -1,7 +1,7 @@
 // 审核页面
 import React, { useEffect, useState } from 'react';
-import { Card, Breadcrumb, Descriptions, Tag, Tabs, message, Modal } from 'antd';
-import { HomeOutlined, CheckCircleOutlined, ArrowLeftOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Card, Breadcrumb, Descriptions, Tag, Tabs, message, Button, Alert } from 'antd';
+import { HomeOutlined, CheckCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { paperService } from '../../services/paperService';
 import { reviewService } from '../../services/reviewService';
@@ -29,7 +29,7 @@ const ReviewPage: React.FC = () => {
     setLoading(true);
     try {
       const response = await paperService.getPaper(Number(paperId));
-      setPaper(response.data.data);
+      setPaper(response.data);
       // 加载审核记录
       await loadReviewLogs(Number(paperId));
     } catch (error) {
@@ -43,7 +43,7 @@ const ReviewPage: React.FC = () => {
   const loadReviewLogs = async (id: number) => {
     try {
       const response = await reviewService.getReviewLogs(id);
-      setReviewLogs(response.data.data);
+      setReviewLogs(response.data);
     } catch (error) {
       console.error('加载审核记录失败:', error);
     }

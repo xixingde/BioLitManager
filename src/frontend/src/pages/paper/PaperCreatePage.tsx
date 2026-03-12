@@ -1,7 +1,7 @@
 // 论文录入页面
 import React from 'react';
-import { Card, Breadcrumb, Button, message, Space } from 'antd';
-import { HomeOutlined, FileTextOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons';
+import { Card, Breadcrumb, message } from 'antd';
+import { HomeOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import PaperForm from '../../components/paper/PaperForm';
 import { paperService } from '../../services/paperService';

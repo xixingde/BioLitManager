@@ -1,6 +1,6 @@
 // 论文状态管理
 import { create } from 'zustand';
-import type { Paper, PaperListResponse, PaperForm } from '../types/paper';
+import type { Paper, PaperForm } from '../types/paper';
 import { paperService } from '../services/paperService';
 
 interface PaperState {
@@ -47,8 +47,8 @@ export const usePaperStore = create<PaperState>((set, get) => ({
       const { page = 1, size = 10, status, keyword } = params;
       const response = await paperService.getPapers({ page, size, status, keyword });
       set({
-        papers: response.data.data.list || [],
-        total: response.data.data.total || 0,
+        papers: response.data.list || [],
+        total: response.data.total || 0,
         page,
         size,
         loading: false,
@@ -65,7 +65,7 @@ export const usePaperStore = create<PaperState>((set, get) => ({
     try {
       const response = await paperService.getPaper(id);
       set({
-        currentPaper: response.data.data,
+        currentPaper: response.data,
         loading: false,
       });
     } catch (error) {
@@ -80,7 +80,7 @@ export const usePaperStore = create<PaperState>((set, get) => ({
     try {
       const response = await paperService.createPaper(data);
       set({ loading: false });
-      return response.data.data.id;
+      return response.data.id;
     } catch (error) {
       set({ loading: false });
       throw error;
@@ -155,7 +155,7 @@ export const usePaperStore = create<PaperState>((set, get) => ({
   checkDuplicate: async (title: string, doi: string) => {
     try {
       const response = await paperService.checkDuplicate({ title, doi });
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw error;
     }
@@ -167,7 +167,7 @@ export const usePaperStore = create<PaperState>((set, get) => ({
     try {
       const response = await paperService.batchImport(file);
       set({ loading: false });
-      return response.data.data;
+      return response.data;
     } catch (error) {
       set({ loading: false });
       throw error;

@@ -441,7 +441,7 @@
         - ListPapers 方法：接收 page、size、status、keyword 参数，分页查询论文列表，支持按标题、作者、期刊、状态筛选，转换为 DTO 列表返回
         - GetMyPapers 方法：接收 userID、page、size 参数，查询该用户提交的论文列表
 
-- [ ] 3.1.4 实现论文提交和草稿保存方法
+- [x] 3.1.4 实现论文提交和草稿保存方法
      【目标对象】`src/backend/internal/service/paper_service.go`
      【修改目的】实现论文提交审核和草稿保存业务逻辑
      【修改方式】在 PaperService 中添加方法
@@ -450,7 +450,7 @@
         - SubmitForReview 方法：接收论文ID和操作人ID，校验论文状态（仅草稿状态可提交），校验必填字段完整性，更新状态为"待业务审核"，记录提交时间和提交人，记录操作日志
         - SaveDraft 方法：接收论文ID和更新请求，保存论文草稿，不进行严格校验和重复校验，状态保持为草稿
 
-- [ ] 3.1.5 实现论文重复校验方法
+- [x] 3.1.5 实现论文重复校验方法
      【目标对象】`src/backend/internal/service/paper_service.go`
      【修改目的】实现论文重复校验业务逻辑
      【修改方式】在 PaperService 中添加方法
@@ -458,7 +458,7 @@
      【修改内容】
         - CheckDuplicate 方法：接收标题和DOI参数，查询是否存在重复论文（相同标题或相同DOI），返回是否重复和重复论文信息
 
-- [ ] 3.1.6 实现论文批量导入方法
+- [x] 3.1.6 实现论文批量导入方法
      【目标对象】`src/backend/internal/service/paper_service.go`
      【修改目的】实现Excel批量导入论文业务逻辑
      【修改方式】在 PaperService 中添加方法
@@ -466,13 +466,13 @@
      【修改内容】
         - BatchImportPapers 方法：接收Excel文件，使用 excelize 库读取Excel内容，校验数据格式和重复性，批量创建论文记录，返回成功数量、失败数量和错误详情列表
 
-- [ ] 3.1.7 实现论文数据校验方法
-     【目标对象】`src/backend/internal/service/paper_service.go`
-     【修改目的】实现论文数据格式校验逻辑
-     【修改方式】在 PaperService 中添加方法
-     【相关依赖】无
-     【修改内容】
-        - ValidatePaperData 方法：接收论文数据，校验DOI格式（正则表达式）、ISSN格式（正则表达式）、日期格式、必填字段，返回校验错误列表
+ - [x] 3.1.7 实现论文数据校验方法
+      【目标对象】`src/backend/internal/service/paper_service.go`
+      【修改目的】实现论文数据格式校验逻辑
+      【修改方式】在 PaperService 中添加方法
+      【相关依赖】无
+      【修改内容】
+         - ValidatePaperData 方法：接收论文数据，校验DOI格式（正则表达式）、ISSN格式（正则表达式）、日期格式、必填字段，返回校验错误列表
 
 #### 3.2 创建作者Service
 - [x] 3.2.1 创建 AuthorService 结构体和构造函数
@@ -576,7 +576,7 @@
      【修改内容】
         - PoliticalReview 方法：接收论文ID、审核结果、审核意见、审核人ID，校验审核权限和论文状态（必须是"待政工审核"），如通过则更新论文状态为"审核通过"并调用归档流程，如驳回则更新论文状态为"草稿"，创建审核记录，发送审核结果通知
 
-- [ ] 3.5.4 实现审核查询方法
+- [x] 3.5.4 实现审核查询方法
      【目标对象】`src/backend/internal/service/review_service.go`
      【修改目的】实现审核记录查询业务逻辑
      【修改方式】在 ReviewService 中添加方法
@@ -586,7 +586,7 @@
         - GetPendingPapersForBusinessReview 方法：返回待业务审核的论文列表，包含提交时间、距提交天数等信息
         - GetPendingPapersForPoliticalReview 方法：返回待政工审核的论文列表，包含提交时间、距提交天数、业务审核意见等信息
 
-- [ ] 3.5.5 实现审核辅助方法
+- [x] 3.5.5 实现审核辅助方法
      【目标对象】`src/backend/internal/service/review_service.go`
      【修改目的】实现审核权限校验、时限检查等辅助逻辑
      【修改方式】在 ReviewService 中添加方法
@@ -837,7 +837,7 @@
         - DeleteFile 方法：DELETE /api/files/:id，解析附件ID，调用 fileService.DeleteFile，返回成功或错误
 
 #### 4.6 创建归档Handler
-- [ ] 4.6.1 创建 ArchiveHandler 结构体和构造函数
+ - [x] 4.6.1 创建 ArchiveHandler 结构体和构造函数
      【目标对象】`src/backend/internal/handler/archive_handler.go`
      【修改目的】实现归档管理HTTP接口基础结构
      【修改方式】创建新文件，定义 ArchiveHandler 结构体和 NewArchiveHandler 函数
@@ -846,7 +846,7 @@
         - 定义 ArchiveHandler 结构体，包含 archiveService 字段
         - 创建 NewArchiveHandler 构造函数
 
-- [ ] 4.6.2 实现归档查询接口
+ - [x] 4.6.2 实现归档查询接口
      【目标对象】`src/backend/internal/handler/archive_handler.go`
      【修改目的】实现归档记录查询HTTP接口
      【修改方式】在 ArchiveHandler 中添加方法
@@ -858,7 +858,7 @@
 ### 5. 后端路由和中间件配置
 
 #### 5.1 注册论文管理路由
-- [ ] 5.1.1 在 main.go 中创建 Handler 实例
+ - [x] 5.1.1 在 main.go 中创建 Handler 实例
      【目标对象】`src/backend/cmd/server/main.go`
      【修改目的】初始化所有论文管理相关的 Handler 实例
      【修改方式】在 main 函数中创建 Handler 实例
@@ -866,7 +866,7 @@
      【修改内容】
         - 在创建 Handler 的代码块中，添加：paperHandler := handler.NewPaperHandler(paperService)、reviewHandler := handler.NewReviewHandler(reviewService)、projectHandler := handler.NewProjectHandler(projectService)、journalHandler := handler.NewJournalHandler(journalService)、fileHandler := handler.NewFileHandler(fileService)、archiveHandler := handler.NewArchiveHandler(archiveService)
 
-- [ ] 5.1.2 注册论文相关API路由
+ - [x] 5.1.2 注册论文相关API路由
      【目标对象】`src/backend/cmd/server/main.go`
      【修改目的】注册论文管理、审核、文件上传等API路由组
      【修改方式】在路由配置部分新增路由组
@@ -914,28 +914,28 @@
           * GET /api/archives/paper/:paperId（论文归档信息），应用 archive:view 权限
 
 #### 5.2 配置文件上传中间件
-- [ ] 5.2.1 创建文件大小限制中间件
-     【目标对象】`src/backend/internal/middleware/file_size_middleware.go`
-     【修改目的】创建限制上传文件大小的中间件
-     【修改方式】创建新文件，实现文件大小限制逻辑
-     【相关依赖】gin框架
-     【修改内容】
-        - 定义 FileSizeLimit 函数，接收 maxMB 参数（最大文件大小MB），返回 gin.HandlerFunc
-        - 在中间件中检查请求头 Content-Length，如果超过限制则返回 413 Payload Too Large 错误
-        - 设置 gin.Context 的 MaxBytesReader
+ - [x] 5.2.1 创建文件大小限制中间件
+      【目标对象】`src/backend/internal/middleware/file_size_middleware.go`
+      【修改目的】创建限制上传文件大小的中间件
+      【修改方式】创建新文件，实现文件大小限制逻辑
+      【相关依赖】gin框架
+      【修改内容】
+         - 定义 FileSizeLimit 函数，接收 maxMB 参数（最大文件大小MB），返回 gin.HandlerFunc
+         - 在中间件中检查请求头 Content-Length，如果超过限制则返回 413 Payload Too Large 错误
+         - 设置 gin.Context 的 MaxBytesReader
 
-- [ ] 5.2.2 应用文件大小限制中间件到文件上传路由
-     【目标对象】`src/backend/cmd/server/main.go`
-     【修改目的】在文件上传路由应用文件大小限制中间件
-     【修改方式】在文件上传路由中应用 FileSizeLimitMiddleware
-     【相关依赖】file_size_middleware
-     【修改内容】
-        - 在 POST /api/files/upload 路由前添加中间件：middleware.FileSizeLimit(100)，限制最大100MB
+ - [x] 5.2.2 应用文件大小限制中间件到文件上传路由
+      【目标对象】`src/backend/cmd/server/main.go`
+      【修改目的】在文件上传路由应用文件大小限制中间件
+      【修改方式】在文件上传路由中应用 FileSizeLimitMiddleware
+      【相关依赖】file_size_middleware
+      【修改内容】
+         - 在 POST /api/files/upload 路由前添加中间件：middleware.FileSizeLimit(100)，限制最大100MB
 
 ### 6. 前端基础设施准备
 
 #### 6.1 安装前端依赖
-- [ ] 6.1.1 安装前端依赖
+ - [x] 6.1.1 安装前端依赖
      【目标对象】`src/frontend/package.json`
      【修改目的】添加表单管理和图表库依赖
      【修改方式】执行 npm install 命令安装依赖
@@ -946,7 +946,7 @@
         - 执行 `npm install` 安装依赖
 
 #### 6.2 创建论文相关类型定义
-- [ ] 6.2.1 创建论文类型定义文件
+- [x] 6.2.1 创建论文类型定义文件
      【目标对象】`src/frontend/src/types/paper.ts`
      【修改目的】定义论文相关的TypeScript类型
      【修改方式】创建新文件，导出类型定义
@@ -957,7 +957,7 @@
         - 定义 PaperStatus 类型：'draft' | 'pending_business' | 'pending_political' | 'approved' | 'rejected'
         - 导出类型和类型转换函数
 
-- [ ] 6.2.2 创建作者类型定义文件
+- [x] 6.2.2 创建作者类型定义文件
      【目标对象】`src/frontend/src/types/author.ts`
      【修改目的】定义作者相关的TypeScript类型
      【修改方式】创建新文件，导出类型定义
@@ -968,7 +968,7 @@
         - 定义 AuthorType 类型：'first_author' | 'co_first_author' | 'corresponding_author' | 'author'
         - 导出类型和类型转换函数
 
-- [ ] 6.2.3 创建课题类型定义文件
+- [x] 6.2.3 创建课题类型定义文件
      【目标对象】`src/frontend/src/types/project.ts`
      【修改目的】定义课题相关的TypeScript类型
      【修改方式】创建新文件，导出类型定义
@@ -980,7 +980,7 @@
         - 定义 ProjectLevel 类型：'national' | 'provincial' | 'municipal'
         - 导出类型和类型转换函数
 
-- [ ] 6.2.4 创建审核类型定义文件
+- [x] 6.2.4 创建审核类型定义文件
      【目标对象】`src/frontend/src/types/review.ts`
      【修改目的】定义审核相关的TypeScript类型
      【修改方式】创建新文件，导出类型定义
@@ -993,7 +993,7 @@
         - 定义 PendingReview 接口：paperId、title、submitterName、submitTime、status、daysSinceSubmit
         - 导出类型和类型转换函数
 
-- [ ] 6.2.5 创建通用类型定义文件
+- [x] 6.2.5 创建通用类型定义文件
      【目标对象】`src/frontend/src/types/common.ts`
      【修改目的】定义通用TypeScript类型
      【修改方式】创建新文件，导出类型定义
@@ -1005,7 +1005,7 @@
         - 导出类型
 
 #### 6.3 创建论文相关Service层
-- [ ] 6.3.1 创建论文Service
+- [x] 6.3.1 创建论文Service
      【目标对象】`src/frontend/src/services/paperService.ts`
      【修改目的】封装论文相关API调用
      【修改方式】创建新文件，实现论文API调用方法
@@ -1024,7 +1024,7 @@
         - 定义 downloadImportTemplate 方法：GET /api/papers/import-template，下载导入模板
         - 导出所有方法
 
-- [ ] 6.3.2 创建作者Service
+- [x] 6.3.2 创建作者Service
      【目标对象】`src/frontend/src/services/authorService.ts`
      【修改目的】封装作者相关API调用
      【修改方式】创建新文件，实现作者API调用方法
@@ -1038,7 +1038,7 @@
         - 定义 searchUsers 方法：GET /api/users/search，从人员库搜索用户（用于关联作者）
         - 导出所有方法
 
-- [ ] 6.3.3 创建课题Service
+- [x] 6.3.3 创建课题Service
      【目标对象】`src/frontend/src/services/projectService.ts`
      【修改目的】封装课题相关API调用
      【修改方式】创建新文件，实现课题API调用方法
@@ -1052,7 +1052,7 @@
         - 定义 searchProjects 方法：GET /api/projects/search，搜索课题
         - 导出所有方法
 
-- [ ] 6.3.4 创建期刊Service
+- [x] 6.3.4 创建期刊Service
      【目标对象】`src/frontend/src/services/journalService.ts`
      【修改目的】封装期刊相关API调用
      【修改方式】创建新文件，实现期刊API调用方法
@@ -1066,7 +1066,7 @@
         - 定义 updateImpactFactor 方法：PUT /api/journals/:id/impact-factor，更新影响因子
         - 导出所有方法
 
-- [ ] 6.3.5 创建审核Service
+- [x] 6.3.5 创建审核Service
      【目标对象】`src/frontend/src/services/reviewService.ts`
      【修改目的】封装审核相关API调用
      【修改方式】创建新文件，实现审核API调用方法
@@ -1080,7 +1080,7 @@
         - 定义 getMyReviews 方法：GET /api/reviews/my，获取我的审核记录
         - 导出所有方法
 
-- [ ] 6.3.6 创建文件Service
+- [x] 6.3.6 创建文件Service
      【目标对象】`src/frontend/src/services/fileService.ts`
      【修改目的】封装文件上传和下载API调用
      【修改方式】创建新文件，实现文件API调用方法
@@ -1114,7 +1114,7 @@
 ### 7. 前端页面组件实现
 
 #### 7.1 创建论文列表页
-- [ ] 7.1.1 创建论文列表页组件基础结构
+- [x] 7.1.1 创建论文列表页组件基础结构
      【目标对象】`src/frontend/src/pages/paper/PaperListPage.tsx`
      【修改目的】实现论文列表查询和展示基础结构
      【修改方式】创建新文件，使用 React 和 Ant Design 组件
@@ -1126,7 +1126,7 @@
         - 定义状态：searchParams（搜索参数）、selectedRowKeys（选中的行）
         - 定义搜索表单字段：title、author、journal、status
 
-- [ ] 7.1.2 实现论文列表查询和展示
+- [x] 7.1.2 实现论文列表查询和展示
      【目标对象】`src/frontend/src/pages/paper/PaperListPage.tsx`
      【修改目的】实现论文列表查询和展示功能
      【修改方式】在 PaperListPage 组件中添加查询和展示逻辑
@@ -1139,7 +1139,7 @@
         - 根据状态显示不同颜色的标签（草稿-灰色、待审核-蓝色、审核通过-绿色、驳回-红色）
         - 实现表格刷新功能
 
-- [ ] 7.1.3 实现论文列表操作功能
+- [x] 7.1.3 实现论文列表操作功能
      【目标对象】`src/frontend/src/pages/paper/PaperListPage.tsx`
      【修改目的】实现论文列表的操作按钮和功能
      【修改方式】在 PaperListPage 组件中添加操作按钮
@@ -1272,7 +1272,7 @@
         - 实现返回论文列表页按钮
 
 #### 7.5 创建业务审核列表页
-- [ ] 7.5.1 创建业务审核列表页组件基础结构
+- [x] 7.5.1 创建业务审核列表页组件基础结构
      【目标对象】`src/frontend/src/pages/review/BusinessReviewListPage.tsx`
      【修改目的】展示待业务审核的论文列表基础结构
      【修改方式】创建新文件，使用 React 和 Ant Design 组件
@@ -1283,7 +1283,7 @@
         - 定义状态：papers（待审核论文列表）、loading、searchParams
         - 使用 useEffect 在组件挂载时获取待审核列表
 
-- [ ] 7.5.2 实现待审核论文列表展示
+- [x] 7.5.2 实现待审核论文列表展示
      【目标对象】`src/frontend/src/pages/review/BusinessReviewListPage.tsx`
      【修改目的】展示待业务审核的论文列表
      【修改方式】在 BusinessReviewListPage 组件中添加列表展示逻辑
@@ -1295,7 +1295,7 @@
         - 实现搜索和筛选功能（按标题、提交人、提交时间）
         - 根据距提交天数显示不同颜色（超过2天显示红色）
 
-- [ ] 7.5.3 实现去审核功能
+- [x] 7.5.3 实现去审核功能
      【目标对象】`src/frontend/src/pages/review/BusinessReviewListPage.tsx`
      【修改目的】实现跳转到审核页面功能
      【修改方式】在 BusinessReviewListPage 组件中添加跳转逻辑
@@ -1307,7 +1307,7 @@
         - 实现快速筛选功能（今日待审、逾期待审等）
 
 #### 7.6 创建政工审核列表页
-- [ ] 7.6.1 创建政工审核列表页组件基础结构
+- [x] 7.6.1 创建政工审核列表页组件基础结构
      【目标对象】`src/frontend/src/pages/review/PoliticalReviewListPage.tsx`
      【修改目的】展示待政工审核的论文列表基础结构
      【修改方式】创建新文件，使用 React 和 Ant Design 组件
@@ -1318,7 +1318,7 @@
         - 定义状态：papers（待审核论文列表）、loading、searchParams
         - 使用 useEffect 在组件挂载时获取待审核列表
 
-- [ ] 7.6.2 实现待审核论文列表展示
+- [x] 7.6.2 实现待审核论文列表展示
      【目标对象】`src/frontend/src/pages/review/PoliticalReviewListPage.tsx`
      【修改目的】展示待政工审核的论文列表
      【修改方式】在 PoliticalReviewListPage 组件中添加列表展示逻辑
@@ -1330,7 +1330,7 @@
         - 实现搜索和筛选功能（按标题、提交人、提交时间）
         - 根据距提交天数显示不同颜色（超过2天显示红色）
 
-- [ ] 7.6.3 实现去审核功能
+- [x] 7.6.3 实现去审核功能
      【目标对象】`src/frontend/src/pages/review/PoliticalReviewListPage.tsx`
      【修改目的】实现跳转到审核页面功能
      【修改方式】在 PoliticalReviewListPage 组件中添加跳转逻辑
@@ -1567,40 +1567,40 @@
         - 调用 onChange 回调函数更新父组件的文件列表
 
 #### 8.6 创建批量导入表单组件
-- [ ] 8.6.1 创建批量导入表单组件基础结构
-     【目标对象】`src/frontend/src/components/paper/BatchImportForm.tsx`
-     【修改目的】封装批量导入表单
-     【修改方式】创建新文件，使用 React 和 Ant Design 实现
-     【相关依赖】paperService
-     【修改内容】
-        - 定义 BatchImportFormProps 接口：onImportComplete（导入完成回调）
-        - 定义 BatchImportForm 函数组件，接收 props
-        - 定义状态：file（上传的文件）、importResult（导入结果）、isImporting
+ - [x] 8.6.1 创建批量导入表单组件基础结构
+      【目标对象】`src/frontend/src/components/paper/BatchImportForm.tsx`
+      【修改目的】封装批量导入表单
+      【修改方式】创建新文件，使用 React 和 Ant Design 实现
+      【相关依赖】paperService
+      【修改内容】
+         - 定义 BatchImportFormProps 接口：onImportComplete（导入完成回调）
+         - 定义 BatchImportForm 函数组件，接收 props
+         - 定义状态：file（上传的文件）、importResult（导入结果）、isImporting
 
-- [ ] 8.6.2 实现导入模板下载和文件上传
-     【目标对象】`src/frontend/src/components/paper/BatchImportForm.tsx`
-     【修改目的】实现导入模板下载和Excel文件上传功能
-     【修改方式】在 BatchImportForm 组件中添加下载和上传逻辑
-     【相关依赖】paperService, Ant Design Upload
-     【修改内容】
-        - 实现下载导入模板按钮，调用 paperService.downloadImportTemplate
-        - 使用 Ant Design Upload 组件上传 Excel 文件
-        - 限制文件类型为 .xlsx 和 .xls
-        - 限制文件大小为 10MB
-        - 实现文件上传前校验
+ - [x] 8.6.2 实现导入模板下载和文件上传
+      【目标对象】`src/frontend/src/components/paper/BatchImportForm.tsx`
+      【修改目的】实现导入模板下载和Excel文件上传功能
+      【修改方式】在 BatchImportForm 组件中添加下载和上传逻辑
+      【相关依赖】paperService, Ant Design Upload
+      【修改内容】
+         - 实现下载导入模板按钮，调用 paperService.downloadImportTemplate
+         - 使用 Ant Design Upload 组件上传 Excel 文件
+         - 限制文件类型为 .xlsx 和 .xls
+         - 限制文件大小为 10MB
+         - 实现文件上传前校验
 
-- [ ] 8.6.3 实现批量导入和结果展示
-     【目标对象】`src/frontend/src/components/paper/BatchImportForm.tsx`
-     【修改目的】实现批量导入和结果展示功能
-     【修改方式】在 BatchImportForm 组件中添加导入和结果展示逻辑
-     【相关依赖】paperService, Ant Design Table, Alert
-     【修改内容】
-        - 实现开始导入按钮，调用 paperService.batchImport
-        - 显示导入中的加载状态
-        - 使用 Ant Design Alert 展示导入结果（成功数量、失败数量）
-        - 使用 Ant Design Table 展示错误详情（错误行号、错误原因、错误字段）
-        - 支持修正后重新导入
-        - 调用 onImportComplete 回调函数通知父组件导入完成
+ - [x] 8.6.3 实现批量导入和结果展示
+      【目标对象】`src/frontend/src/components/paper/BatchImportForm.tsx`
+      【修改目的】实现批量导入和结果展示功能
+      【修改方式】在 BatchImportForm 组件中添加导入和结果展示逻辑
+      【相关依赖】paperService, Ant Design Table, Alert
+      【修改内容】
+         - 实现开始导入按钮，调用 paperService.batchImport
+         - 显示导入中的加载状态
+         - 使用 Ant Design Alert 展示导入结果（成功数量、失败数量）
+         - 使用 Ant Design Table 展示错误详情（错误行号、错误原因、错误字段）
+         - 支持修正后重新导入
+         - 调用 onImportComplete 回调函数通知父组件导入完成
 
 ### 9. 前端路由和菜单配置
 
@@ -1664,7 +1664,7 @@
           * "政工审核" - 链接到 /reviews/political（仅政工审核人员可访问，使用 hasPermission('review:political')）
         - 使用 hasPermission 方法实现权限控制，无权限的用户不显示对应的菜单项
 
-- [ ] 9.2.3 在Layout中新增课题管理菜单项（可选）
+- [x] 9.2.3 在Layout中新增课题管理菜单项（可选）
      【目标对象】`src/frontend/src/components/Layout/Layout.tsx`
      【修改目的】在菜单中新增课题管理菜单项
      【修改方式】在菜单配置中新增菜单项
@@ -1677,35 +1677,35 @@
 ### 10. 后端定时任务实现（可选）
 
 #### 10.1 实现审核时限提醒任务
-- [ ] 10.1.1 在 main.go 中启动审核时限提醒定时任务
-     【目标对象】`src/backend/cmd/server/main.go`
-     【修改目的】启动定时任务检查待审核论文，发送逾期提醒
-     【修改方式】在 main 函数中启动定时任务
-     【相关依赖】review_service, notification_service
-     【修改内容】
-        - 在 main 函数启动服务前，使用 go 关键字启动一个 goroutine
-        - 使用 time.Ticker 创建定时器，每小时执行一次
-        - 在 goroutine 中调用 reviewService.SendReviewReminderForOverdue 方法
-        - 添加日志记录定时任务的执行情况
+ - [x] 10.1.1 在 main.go 中启动审核时限提醒定时任务
+      【目标对象】`src/backend/cmd/server/main.go`
+      【修改目的】启动定时任务检查待审核论文，发送逾期提醒
+      【修改方式】在 main 函数中启动定时任务
+      【相关依赖】review_service, notification_service
+      【修改内容】
+         - 在 main 函数启动服务前，使用 go 关键字启动一个 goroutine
+         - 使用 time.Ticker 创建定时器，每小时执行一次
+         - 在 goroutine 中调用 reviewService.SendReviewReminderForOverdue 方法
+         - 添加日志记录定时任务的执行情况
 
-- [ ] 10.1.2 实现检查逾期审核的方法
-     【目标对象】`src/backend/internal/service/review_service.go`
-     【修改目的】查询待审核且超过2个工作日的论文，发送提醒通知
-     【修改方式】在 ReviewService 中添加方法
-     【相关依赖】review_repository, notification_service
-     【修改内容】
-        - 实现 SendReviewReminderForOverdue 方法：
-          * 查询所有状态为"待业务审核"和"待政工审核"的论文
-          * 计算距离提交时间的工作日数
-          * 筛选出超过2个工作日且未发送过提醒的论文
-          * 对每篇论文调用 notification_service 发送提醒通知给对应的审核人员
-          * 记录已发送提醒的标记（可添加字段或在操作日志中记录）
-        - 添加日志记录提醒发送情况
+ - [x] 10.1.2 实现检查逾期审核的方法
+      【目标对象】`src/backend/internal/service/review_service.go`
+      【修改目的】查询待审核且超过2个工作日的论文，发送提醒通知
+      【修改方式】在 ReviewService 中添加方法
+      【相关依赖】review_repository, notification_service
+      【修改内容】
+         - 实现 SendReviewReminderForOverdue 方法：
+           * 查询所有状态为"待业务审核"和"待政工审核"的论文
+           * 计算距离提交时间的工作日数
+           * 筛选出超过2个工作日且未发送过提醒的论文
+           * 对每篇论文调用 notification_service 发送提醒通知给对应的审核人员
+           * 记录已发送提醒的标记（可添加字段或在操作日志中记录）
+         - 添加日志记录提醒发送情况
 
 ### 11. 测试和验证
 
 #### 11.1 后端接口测试
-- [ ] 11.1.1 测试论文CRUD接口
+- [x] 11.1.1 测试论文CRUD接口
      【目标对象】所有论文相关Handler接口
      【修改目的】验证论文CRUD接口功能正确性
      【修改方式】使用 Postman 或 cURL 测试各接口
@@ -1717,7 +1717,7 @@
         - 测试 PUT /api/papers/:id 更新论文接口（草稿状态更新、非草稿状态更新）
         - 测试 DELETE /api/papers/:id 删除论文接口（草稿状态删除、非草稿状态删除）
 
-- [ ] 11.1.2 测试论文提交和校验接口
+- [x] 11.1.2 测试论文提交和校验接口
      【目标对象】论文提交和校验相关Handler接口
      【修改目的】验证论文提交和校验接口功能正确性
      【修改方式】使用 Postman 或 cURL 测试各接口
@@ -1728,7 +1728,7 @@
         - 测试 POST /api/papers/check-duplicate 检查重复接口（正常数据、重复数据）
         - 测试 GET /api/papers/my 获取我的论文接口
 
-- [ ] 11.1.3 测试审核接口
+- [x] 11.1.3 测试审核接口
      【目标对象】审核相关Handler接口
      【修改目的】验证审核接口功能正确性
      【修改方式】使用 Postman 或 cURL 测试各接口

@@ -1,17 +1,10 @@
 // 文件上传组件
 import React, { useState } from 'react';
-import { Upload, Button, List, Tag, Space, message, Modal, Progress } from 'antd';
+import { Upload, Button, List, Tag, Space, message, Modal } from 'antd';
 import { UploadOutlined, DownloadOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd';
 import { fileService } from '../../services/fileService';
-
-// 文件类型选项
-const fileTypeOptions = [
-  { label: '全文', value: '全文' },
-  { label: '首页', value: '首页' },
-  { label: '期刊封面', value: '期刊封面' },
-  { label: '审批件', value: '审批件' },
-];
+import { paperService } from '../../services/paperService';
 
 interface FileUploadProps {
   paperId: number;
@@ -33,7 +26,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ paperId, mode }) => {
   const loadAttachments = async () => {
     try {
       const response = await paperService.getPaper(paperId);
-      setAttachments(response.data.data.attachments || []);
+      setAttachments(response.data.attachments || []);
     } catch (error) {
       console.error('加载附件列表失败:', error);
     }
@@ -79,26 +72,26 @@ const FileUpload: React.FC<FileUploadProps> = ({ paperId, mode }) => {
       xhr.upload.onprogress = (e: ProgressEvent) => {
         if (e.lengthComputable) {
           const percent = Math.round((e.loaded / e.total) * 100);
-          onProgress?.({ percent }, file as UploadFile);
+          onProgress?.({ percent }, uploadFile);
         }
       };
 
       xhr.onload = () => {
         if (xhr.status === 200) {
           message.success('文件上传成功');
-          onSuccess?.(xhr.response, file as UploadFile);
+          onSuccess?.(xhr.response, uploadFile);
           // 重新加载附件列表
           loadAttachments();
         } else {
           message.error('文件上传失败');
-          onError?.(new Error('上传失败'), file as UploadFile);
+          onError?.(new Error('上传失败'), uploadFile);
         }
         setUploading(false);
       };
 
       xhr.onerror = () => {
         message.error('文件上传失败');
-        onError?.(new Error('上传失败'), file as UploadFile);
+        onError?.(new Error('上传失败'), uploadFile);
         setUploading(false);
       };
 
@@ -133,7 +126,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ paperId, mode }) => {
   const handleDownload = async (attachment: any) => {
     try {
       const response = await fileService.downloadFile(attachment.id);
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: attachment.mime_type }));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', attachment.file_name);

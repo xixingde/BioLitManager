@@ -1,7 +1,7 @@
 // 论文列表页
 import { useState, useEffect } from 'react';
 import { Table, Button, Input, Select, Space, Tag, message } from 'antd';
-import { PlusOutlined, SearchOutlined, EyeOutlined, EditOutlined, DeleteOutlined, SendOutlined } from '@ant-design/icons';
+import { PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined, SendOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { paperService } from '../../services/paperService';
 import type { Paper } from '../../types/paper';

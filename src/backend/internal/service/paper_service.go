@@ -1,8 +1,9 @@
 package service
 
 import (
-	"errors"
+	stderrors "errors"
 	"fmt"
+	"regexp"
 	"time"
 
 	"biolitmanager/internal/model/entity"
@@ -16,12 +17,36 @@ import (
 
 var (
 	// ErrPaperNotFound 论文不存在
-	ErrPaperNotFound = errors.New("论文不存在")
+	ErrPaperNotFound = stderrors.New("论文不存在")
 	// ErrPaperDuplicate 论文重复
-	ErrPaperDuplicate = errors.New("论文已存在重复")
+	ErrPaperDuplicate = stderrors.New("论文已存在重复")
 	// ErrInvalidStatus 无效的状态
-	ErrInvalidStatus = errors.New("无效的状态")
+	ErrInvalidStatus = stderrors.New("无效的状态")
+	// ErrPaperTitleRequired 标题为必填项
+	ErrPaperTitleRequired = stderrors.New("标题为必填项")
+	// ErrPaperAbstractRequired 摘要为必填项
+	ErrPaperAbstractRequired = stderrors.New("摘要为必填项")
+	// ErrPaperDOIInvalid DOI格式无效
+	ErrPaperDOIInvalid = stderrors.New("DOI格式无效")
+	// ErrPaperPublishDateInvalid 出版日期格式无效
+	ErrPaperPublishDateInvalid = stderrors.New("出版日期格式无效")
+	// ErrPaperImpactFactorInvalid 影响因子不能为负数
+	ErrPaperImpactFactorInvalid = stderrors.New("影响因子不能为负数")
 )
+
+// PaperServiceInterface 论文服务接口
+type PaperServiceInterface interface {
+	CreatePaper(title, abstract string, journalID uint, doi string, impactFactor float64, publishDate *time.Time, submitterID uint, authors []*entity.Author, projectIDs []uint, operatorID uint, ipAddress string) (*entity.Paper, error)
+	GetPaperByID(id uint) (*entity.Paper, error)
+	ListPapers(page, size int) ([]*entity.Paper, int64, error)
+	UpdatePaper(id uint, title, abstract string, journalID uint, doi string, impactFactor float64, publishDate *time.Time, authors []*entity.Author, projectIDs []uint, operatorID uint, ipAddress string) error
+	DeletePaper(id, operatorID uint, ipAddress string) error
+	SubmitForReview(id, operatorID uint, ipAddress string) error
+	SaveDraft(id uint, title, abstract string, journalID uint, doi string, impactFactor float64, publishDate *time.Time, authors []*entity.Author, projectIDs []uint, operatorID uint, ipAddress string) error
+	CheckDuplicate(title, doi string) ([]*entity.Paper, error)
+	GetMyPapers(userID uint, page, size int) ([]*entity.Paper, int64, error)
+	BatchImportPapers(file *excelize.File, submitterID uint) (int, int, []string)
+}
 
 // PaperService 论文服务
 type PaperService struct {
@@ -729,4 +754,56 @@ func (s *PaperService) BatchImportPapers(file *excelize.File, submitterID uint) 
 	)
 
 	return successCount, failedCount, errors
+}
+
+// ValidatePaperData 校验论文数据
+func (s *PaperService) ValidatePaperData(title, abstract, doi, publishDate string, impactFactor float64) error {
+	// 校验标题必填
+	if title == "" {
+		logger.GetLogger().Warn("Paper title is required")
+		return ErrPaperTitleRequired
+	}
+
+	// 校验摘要必填
+	if abstract == "" {
+		logger.GetLogger().Warn("Paper abstract is required")
+		return ErrPaperAbstractRequired
+	}
+
+	// 校验 DOI 格式（如果提供了）
+	if doi != "" {
+		doiPattern := regexp.MustCompile(`^10\.\d{4,9}/[-._;()/:A-Z0-9]+$`)
+		if !doiPattern.MatchString(doi) {
+			logger.GetLogger().Warn("Paper DOI format is invalid",
+				zap.String("doi", doi),
+			)
+			return ErrPaperDOIInvalid
+		}
+	}
+
+	// 校验出版日期格式（如果提供了）
+	if publishDate != "" {
+		if _, err := time.Parse("2006-01-02", publishDate); err != nil {
+			logger.GetLogger().Warn("Paper publish date format is invalid",
+				zap.String("publish_date", publishDate),
+				zap.Error(err),
+			)
+			return ErrPaperPublishDateInvalid
+		}
+	}
+
+	// 校验影响因子
+	if impactFactor < 0 {
+		logger.GetLogger().Warn("Paper impact factor cannot be negative",
+			zap.Float64("impact_factor", impactFactor),
+		)
+		return ErrPaperImpactFactorInvalid
+	}
+
+	logger.GetLogger().Info("Paper data validation passed",
+		zap.String("title", title),
+		zap.String("doi", doi),
+	)
+
+	return nil
 }

@@ -1,12 +1,11 @@
 // 作者列表组件
 import React, { useState } from 'react';
-import { List, Button, Select, Input, InputNumber, Space, Tag, Popconfirm, message } from 'antd';
+import { List, Button, Select, Input, Space, Popconfirm, message } from 'antd';
 import { PlusOutlined, MinusCircleOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
 import type { Author } from '../../types/paper';
 import { authService } from '../../services/authService';
 
 const { Option } = Select;
-const { TextArea } = Input;
 
 interface AuthorListProps {
   mode: 'create' | 'edit' | 'view';
@@ -31,7 +30,7 @@ const AuthorList: React.FC<AuthorListProps> = ({ mode, value = [], onChange }) =
     setLoadingUsers(true);
     try {
       const response = await authService.searchUsers({ keyword, page: 1, size: 50 });
-      setUsers(response.data.data.list || []);
+      setUsers(response.data.list || []);
     } catch (error) {
       message.error('加载用户列表失败');
     } finally {

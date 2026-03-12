@@ -1,22 +1,36 @@
 // 论文详情页面
 import React, { useEffect, useState } from 'react';
 import { Card, Breadcrumb, Descriptions, Tag, Button, Space, message, Tabs, Table, Modal } from 'antd';
-import { HomeOutlined, FileTextOutlined, EditOutlined, ArrowLeftOutlined, SendOutlined } from '@ant-design/icons';
+import { HomeOutlined, FileTextOutlined, EditOutlined, ArrowLeftOutlined, SendOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { paperService } from '../../services/paperService';
 import { reviewService } from '../../services/reviewService';
-import type { Paper, ReviewLog } from '../../types/paper';
-import type { ReviewLog as ReviewLogType } from '../../types/review';
+import ExportButton from '../../components/common/ExportButton';
+import { useAuth } from '../../hooks/useAuth';
+import { ROLE } from '../../utils/constants';
+import type { Paper } from '../../types/paper';
+import type { ReviewLog } from '../../types/review';
 
 const { TabPane } = Tabs;
 
 const PaperDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [paper, setPaper] = useState<Paper | null>(null);
-  const [reviewLogs, setReviewLogs] = useState<ReviewLogType[]>([]);
+  const [reviewLogs, setReviewLogs] = useState<ReviewLog[]>([]);
   const [submitModalVisible, setSubmitModalVisible] = useState(false);
+
+  // 检查用户是否有导出权限
+  const canExport = (): boolean => {
+    if (!paper || !user) return false;
+    // 超级管理员可以导出所有论文
+    if (user.role === ROLE.SUPER_ADMIN) return true;
+    // 普通用户只能导出自己提交的论文
+    if (paper.submitter?.id === user.id) return true;
+    return false;
+  };
 
   // 加载论文详情
   const loadPaperDetail = async () => {
@@ -24,7 +38,7 @@ const PaperDetailPage: React.FC = () => {
     setLoading(true);
     try {
       const response = await paperService.getPaper(Number(id));
-      setPaper(response.data.data);
+      setPaper(response.data);
       // 加载审核记录
       await loadReviewLogs(Number(id));
     } catch (error) {
@@ -38,7 +52,7 @@ const PaperDetailPage: React.FC = () => {
   const loadReviewLogs = async (paperId: number) => {
     try {
       const response = await reviewService.getReviewLogs(paperId);
-      setReviewLogs(response.data.data);
+      setReviewLogs(response.data);
     } catch (error) {
       console.error('加载审核记录失败:', error);
     }
@@ -152,6 +166,9 @@ const PaperDetailPage: React.FC = () => {
         }
         extra={
           <Space>
+            {canExport() && (
+              <ExportButton type="paper" paperId={Number(id)} />
+            )}
             {paper.status === 'draft' && (
               <>
                 <Button type="primary" icon={<EditOutlined />} onClick={handleEdit}>

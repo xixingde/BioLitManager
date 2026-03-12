@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"biolitmanager/internal/cache"
 	"biolitmanager/internal/config"
@@ -89,19 +90,22 @@ func main() {
 	attachmentRepo := repository.NewAttachmentRepository(db)
 	reviewRepo := repository.NewReviewRepository(db)
 	archiveRepo := repository.NewArchiveRepository(db)
+	statsRepo := repository.NewStatsRepository(db)
 
 	// 初始化 services
 	operationLogService := service.NewOperationLogService(operationLogRepo)
 	authService := service.NewAuthService(userRepo, memoryCache, operationLogService)
 	userService := service.NewUserService(userRepo, operationLogService)
-	authorService := service.NewAuthorService(authorRepo)
 	projectService := service.NewProjectService(projectRepo, paperProjectRepo, operationLogService)
 	journalService := service.NewJournalService(journalRepo, operationLogService)
 	fileService := service.NewFileService(attachmentRepo)
 	notificationService := service.NewNotificationService(userRepo, operationLogService)
-	reviewService := service.NewReviewService(db, reviewRepo, paperRepo, operationLogService)
 	archiveService := service.NewArchiveService(archiveRepo, paperRepo, operationLogService)
+	reviewService := service.NewReviewService(db, reviewRepo, paperRepo, userRepo, operationLogService, notificationService, archiveService)
 	paperService := service.NewPaperService(db, paperRepo, authorRepo, attachmentRepo, paperProjectRepo, operationLogService)
+	searchService := service.NewSearchService(db, paperRepo, authorRepo, paperProjectRepo)
+	statsService := service.NewStatsService(statsRepo)
+	exportService := service.NewExportService(db, paperRepo, authorRepo, projectRepo, reviewRepo, userRepo)
 
 	// 初始化 handlers
 	authHandler := handler.NewAuthHandler(authService)
@@ -111,6 +115,10 @@ func main() {
 	projectHandler := handler.NewProjectHandler(projectService)
 	journalHandler := handler.NewJournalHandler(journalService)
 	fileHandler := handler.NewFileHandler(fileService)
+	archiveHandler := handler.NewArchiveHandler(archiveService)
+	searchHandler := handler.NewSearchHandler(searchService, paperService)
+	statsHandler := handler.NewStatsHandler(statsService)
+	exportHandler := handler.NewExportHandler(exportService, paperService, paperRepo, statsService)
 
 	// 创建 Gin 实例
 	if cfg.Server.Mode == "release" {
@@ -184,6 +192,7 @@ func main() {
 				papers.POST("/:id/save-draft", paperHandler.SaveDraft)
 				papers.POST("/check-duplicate", paperHandler.CheckDuplicate)
 				papers.POST("/batch-import", paperHandler.BatchImport)
+				papers.GET("/import-template", paperHandler.DownloadImportTemplate)
 			}
 
 			// 审核管理路由
@@ -221,13 +230,87 @@ func main() {
 			// 文件管理路由
 			files := authenticated.Group("/files")
 			{
-				files.POST("/upload", fileHandler.UploadFile)
+				files.POST("/upload", middleware.FileSizeLimit(100), fileHandler.UploadFile)
 				files.GET("/:id", fileHandler.GetFile)
 				files.GET("/:id/download", fileHandler.DownloadFile)
 				files.DELETE("/:id", fileHandler.DeleteFile)
 			}
+
+			// 归档管理路由
+			archives := authenticated.Group("/archives")
+			{
+				archives.GET("", archiveHandler.GetArchiveList)
+				archives.GET("/paper/:paperId", archiveHandler.GetArchiveByPaper)
+				archives.PUT("/:paperId/hide", archiveHandler.HideArchive)
+				archives.POST("/:paperId/modify", archiveHandler.SubmitModifyRequest)
+			}
+
+			// 搜索管理路由
+			search := authenticated.Group("/search")
+			{
+				search.GET("", searchHandler.Search)
+				search.GET("/papers/:id", searchHandler.GetPaperDetail)
+			}
+
+			// 统计管理路由（需要 stats:view 权限）
+			stats := authenticated.Group("/stats")
+			stats.Use(middleware.PermissionMiddleware(security.PermissionStatsView))
+			{
+				stats.GET("/basic", statsHandler.GetBasicStats)
+				stats.GET("/author/:id", statsHandler.GetAuthorStats)
+				stats.GET("/project/:id", statsHandler.GetProjectStats)
+				stats.GET("/department", statsHandler.GetDepartmentStats)
+				stats.GET("/yearly", statsHandler.GetYearlyStats)
+				stats.GET("/journal", statsHandler.GetJournalStats)
+			}
+
+			// 导出管理路由
+			export := authenticated.Group("/export")
+			{
+				// 论文导出（需要 paper:export 权限）
+				papersExport := export.Group("")
+				papersExport.Use(middleware.PermissionMiddleware(security.PermissionPaperExport))
+				{
+					papersExport.POST("/papers", exportHandler.ExportPapers)
+					papersExport.GET("/paper/:id", exportHandler.ExportPaper)
+				}
+
+				// 统计导出（需要 stats:export 权限）
+				statsExport := export.Group("")
+				statsExport.Use(middleware.PermissionMiddleware(security.PermissionStatsExport))
+				{
+					statsExport.POST("/stats", exportHandler.ExportStats)
+				}
+
+				// 公共导出路由（不需要额外权限检查）
+				export.GET("/download", exportHandler.DownloadExportFile)
+				export.GET("/fields", exportHandler.GetExportFields)
+			}
 		}
 	}
+
+	// 启动审核时限提醒定时任务
+	go func() {
+		ticker := time.NewTicker(1 * time.Hour)
+		defer ticker.Stop()
+
+		// 启动时立即执行一次
+		logger.GetLogger().Info("Starting review reminder timer task")
+		if err := reviewService.SendReviewReminderForOverdue(); err != nil {
+			logger.GetLogger().Error("Failed to execute review reminder task",
+				zap.Error(err),
+			)
+		}
+
+		for range ticker.C {
+			logger.GetLogger().Info("Executing scheduled review reminder task")
+			if err := reviewService.SendReviewReminderForOverdue(); err != nil {
+				logger.GetLogger().Error("Failed to execute review reminder task",
+					zap.Error(err),
+				)
+			}
+		}
+	}()
 
 	// 启动 HTTP 服务器
 	addr := ":" + cfg.Server.Port

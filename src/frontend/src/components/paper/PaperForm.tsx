@@ -8,7 +8,7 @@ import { journalService } from '../../services/journalService';
 import AuthorList from './AuthorList';
 import ProjectSelector from './ProjectSelector';
 import FileUpload from './FileUpload';
-import type { Paper, PaperForm, Author } from '../../types/paper';
+import type { Paper, PaperForm } from '../../types/paper';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -34,7 +34,6 @@ const PaperForm: React.FC<PaperFormProps> = ({
   const currentForm = form || formInstance;
   const [journals, setJournals] = React.useState<any[]>([]);
   const [loadingJournals, setLoadingJournals] = React.useState(false);
-  const [duplicateCheck, setDuplicateCheck] = React.useState<{ count: number; papers: Paper[] } | null>(null);
 
   // 加载期刊列表
   React.useEffect(() => {
@@ -54,8 +53,8 @@ const PaperForm: React.FC<PaperFormProps> = ({
   const loadJournals = async () => {
     setLoadingJournals(true);
     try {
-      const response = await journalService.listJournals({ page: 1, size: 1000 });
-      setJournals(response.data.data.list || []);
+      const response = await journalService.getJournals({ page: 1, size: 1000 });
+      setJournals(response.data.list || []);
     } catch (error) {
       message.error('加载期刊列表失败');
     } finally {
@@ -74,7 +73,6 @@ const PaperForm: React.FC<PaperFormProps> = ({
 
     try {
       const response = await paperService.checkDuplicate({ title, doi });
-      setDuplicateCheck(response.data);
       if (response.data.count > 0) {
         message.warning(`检测到 ${response.data.count} 篇可能重复的论文`);
       } else {
@@ -134,14 +132,13 @@ const PaperForm: React.FC<PaperFormProps> = ({
       <Form.Item
         label="期刊"
         name="journal_id"
-        rules={[{ required: true, message: '请选择期刊' }]}
       >
         <Select
           placeholder="请选择期刊"
           loading={loadingJournals}
           showSearch
           filterOption={(input, option) =>
-            (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+            String(option?.children || '').toLowerCase().includes(input.toLowerCase())
           }
         >
           {journals.map(journal => (

@@ -80,4 +80,62 @@ export interface PageResponse<T> {
   size: number;
 }
 
+// 逻辑类型
+export type LogicType = 'AND' | 'OR' | 'NOT';
+
+// 作者类型筛选
+export type AuthorTypeFilter = 'first_author' | 'co_first_author' | 'corresponding_author' | 'all';
+
+// 排序字段
+export type SortField = 'publish_date' | 'impact_factor' | 'created_at' | 'title' | 'journal_name';
+
+// 排序方向
+export type SortOrder = 'asc' | 'desc';
+
+// 单个查询条件
+export interface QueryCondition {
+  field: string;
+  operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'in' | 'between';
+  value: string | number | string[] | number[];
+}
+
+// 分页信息
+export interface PaginationInfo {
+  page: number;
+  size: number;
+  total?: number;
+}
+
+// 排序信息
+export interface SortInfo {
+  field: SortField;
+  order: SortOrder;
+}
+
+// 搜索请求
+export interface SearchRequest {
+  query?: QueryCondition[];
+  logic?: LogicType;
+  pagination?: PaginationInfo;
+  sort?: SortInfo;
+  author_type_filter?: AuthorTypeFilter;
+}
+
+// 归档信息
+export interface ArchiveInfo {
+  is_archived: boolean;
+  archive_time?: string;
+  archive_user?: User;
+  archive_reason?: string;
+}
+
+// 搜索结果项
+export interface PaperSearchResult extends Paper {
+  archive_info?: ArchiveInfo;
+  match_score?: number;
+}
+
 export interface PaperListResponse extends PageResponse<Paper> {}
+
+// 搜索响应
+export interface PaperSearchResponse extends PageResponse<PaperSearchResult> {}

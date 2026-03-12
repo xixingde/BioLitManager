@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Spin } from 'antd';
 import { useAuth } from '@/hooks/useAuth';
+
+const Loading: React.FC = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+    <Spin size="large" tip="加载中..." />
+  </div>
+);
 
 const LoginPage = React.lazy(() => import('@/pages/login/LoginPage'));
 const HomePage = React.lazy(() => import('@/pages/home/HomePage'));
@@ -11,6 +18,9 @@ const BatchImportPage = React.lazy(() => import('@/pages/paper/BatchImportPage')
 const BusinessReviewListPage = React.lazy(() => import('@/pages/review/BusinessReviewListPage'));
 const PoliticalReviewListPage = React.lazy(() => import('@/pages/review/PoliticalReviewListPage'));
 const ReviewPage = React.lazy(() => import('@/pages/review/ReviewPage'));
+const SearchPage = React.lazy(() => import('@/pages/search/SearchPage'));
+const ArchivePage = React.lazy(() => import('@/pages/archive/ArchivePage'));
+const StatsPage = React.lazy(() => import('@/pages/stats/StatsPage'));
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -26,7 +36,8 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 const Router: React.FC = () => {
   return (
     <BrowserRouter>
-      <Routes>
+      <Suspense fallback={<Loading />}>
+        <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/"
@@ -120,7 +131,23 @@ const Router: React.FC = () => {
           path="/statistics"
           element={
             <PrivateRoute>
-              <HomePage />
+              <StatsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <PrivateRoute>
+              <SearchPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/archives"
+          element={
+            <PrivateRoute>
+              <ArchivePage />
             </PrivateRoute>
           }
         />
@@ -158,6 +185,7 @@ const Router: React.FC = () => {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };

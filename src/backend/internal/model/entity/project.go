@@ -18,6 +18,8 @@ type Project struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
+
+	Papers []*Paper `gorm:"many2many:paper_projects;foreignKey:ID;references:ID" json:"papers,omitempty"`
 }
 
 // TableName 指定表名

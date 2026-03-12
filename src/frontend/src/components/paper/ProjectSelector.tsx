@@ -1,7 +1,7 @@
 // 课题选择器组件
 import React, { useState } from 'react';
 import { Select, Button, Input, Modal, Form, message, Space, Tag } from 'antd';
-import { PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { projectService } from '../../services/projectService';
 import type { Project } from '../../types/paper';
 
@@ -16,7 +16,6 @@ interface ProjectSelectorProps {
 const ProjectSelector: React.FC<ProjectSelectorProps> = ({ mode, value = [], onChange }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [form] = Form.useForm();
 
@@ -25,7 +24,7 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ mode, value = [], onC
     setLoading(true);
     try {
       const response = await projectService.getProjects({ page: 1, size: 50, name: keyword });
-      setProjects(response.data.data.list || []);
+      setProjects(response.data.list || []);
     } catch (error) {
       message.error('加载课题列表失败');
     } finally {
@@ -39,7 +38,6 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({ mode, value = [], onC
 
   // 搜索课题
   const handleSearch = (value: string) => {
-    setSearchKeyword(value);
     loadProjects(value);
   };
 

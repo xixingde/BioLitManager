@@ -1,1 +1,5 @@
 cs.exe
+.agents
+*.exe
+src/backend/*.exe~
+*.png

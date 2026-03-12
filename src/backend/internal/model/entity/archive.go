@@ -11,6 +11,8 @@ type Archive struct {
 	ArchiveNumber string    `gorm:"type:varchar(50);uniqueIndex;not null" json:"archive_number"`
 	ArchiveDate   time.Time `gorm:"not null" json:"archive_date"`
 	ArchiverID    uint      `gorm:"index;not null" json:"archiver_id"`
+	Status        string    `gorm:"type:varchar(20);default:'public'" json:"status"`
+	IsHidden      bool      `gorm:"default:false" json:"is_hidden"`
 	CreatedAt     time.Time `json:"created_at"`
 
 	// 关联关系

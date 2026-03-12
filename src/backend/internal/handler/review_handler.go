@@ -16,11 +16,11 @@ import (
 
 // ReviewHandler 审核处理器
 type ReviewHandler struct {
-	reviewService *service.ReviewService
+	reviewService service.ReviewServiceInterface
 }
 
 // NewReviewHandler 创建审核处理器实例
-func NewReviewHandler(reviewService *service.ReviewService) *ReviewHandler {
+func NewReviewHandler(reviewService service.ReviewServiceInterface) *ReviewHandler {
 	return &ReviewHandler{
 		reviewService: reviewService,
 	}
@@ -230,8 +230,15 @@ func (h *ReviewHandler) GetMyReviews(c *gin.Context) {
 		return
 	}
 
-	_ = reviewerID // TODO: 实现获取我的审核记录方法
-	// reviewLogs, err := h.reviewService.ListByReviewer(reviewerID.(uint))
+	reviewLogs, err := h.reviewService.GetMyReviews(reviewerID.(uint))
+	if err != nil {
+		logger.GetLogger().Error("Failed to get my reviews",
+			zap.Uint("reviewer_id", reviewerID.(uint)),
+			zap.Error(err),
+		)
+		response.Error(c, http.StatusInternalServerError, "系统异常")
+		return
+	}
 
-	response.Success(c, []reviewresponse.ReviewLogDTO{})
+	response.Success(c, reviewLogs)
 }

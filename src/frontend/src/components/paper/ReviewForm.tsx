@@ -1,6 +1,6 @@
 // 审核表单组件
 import React from 'react';
-import { Form, Radio, Input, Button, Space, message } from 'antd';
+import { Form, Radio, Input, Button, Space } from 'antd';
 import type { FormInstance } from 'antd';
 
 const { TextArea } = Input;

@@ -11,9 +11,8 @@ type PaperProject struct {
 	ProjectID uint      `gorm:"index:idx_paper_project;not null" json:"project_id"`
 	CreatedAt time.Time `json:"created_at"`
 
-	// 关联关系
-	Paper   *Paper   `gorm:"foreignKey:PaperID" json:"paper,omitempty"`
-	Project *Project `gorm:"foreignKey:ProjectID" json:"project,omitempty"`
+	Paper   *Paper   `gorm:"foreignKey:PaperID;references:ID" json:"paper,omitempty"`
+	Project *Project `gorm:"foreignKey:ProjectID;references:ID" json:"project,omitempty"`
 }
 
 // TableName 指定表名

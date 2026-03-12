@@ -11,10 +11,13 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined
+  UploadOutlined,
+  SearchOutlined,
+  FileDoneOutlined
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { PERMISSION } from '@/utils/constants';
 
 const { Header, Sider, Content } = Layout;
 
@@ -22,7 +25,7 @@ const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout, hasRole } = useAuth();
+  const { user, logout, hasRole, hasPermission } = useAuth();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
@@ -70,10 +73,22 @@ const MainLayout: React.FC = () => {
         ],
       },
     ] : []),
+    ...(hasPermission(PERMISSION.STATS_VIEW) ? [
+      {
+        key: '/statistics',
+        icon: <BarChartOutlined />,
+        label: '统计分析',
+      },
+    ] : []),
     {
-      key: '/statistics',
-      icon: <BarChartOutlined />,
-      label: '统计分析',
+      key: '/search',
+      icon: <SearchOutlined />,
+      label: '论文查询',
+    },
+    {
+      key: '/archives',
+      icon: <FileDoneOutlined />,
+      label: '归档管理',
     },
     ...(hasRole('admin') ? [
       {
@@ -146,6 +161,12 @@ const MainLayout: React.FC = () => {
     }
     if (path.startsWith('/statistics')) {
       return ['/statistics'];
+    }
+    if (path.startsWith('/search')) {
+      return ['/search'];
+    }
+    if (path.startsWith('/archives')) {
+      return ['/archives'];
     }
     if (path.startsWith('/system')) {
       return ['/system'];

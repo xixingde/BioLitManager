@@ -19,16 +19,17 @@ const requestInterceptor = (config: InternalAxiosRequestConfig): InternalAxiosRe
   return config;
 };
 
-const responseInterceptor = (response: AxiosResponse<ApiResponse>): AxiosResponse<ApiResponse> => {
-  const { data } = response;
-  if (data.code !== '000000') {
+const responseInterceptor = (response: AxiosResponse): AxiosResponse<ApiResponse> => {
+  const data = response.data as ApiResponse;
+  const code = String(data.code);
+  if (code !== '000000' && code !== '0' && code !== '0') {
     message.error(data.msg || '请求失败');
-    return Promise.reject(new Error(data.msg || '请求失败'));
+    throw response;
   }
-  return response;
+  return response as AxiosResponse<ApiResponse>;
 };
 
-const responseErrorInterceptor = (error: AxiosError<ApiResponse>): Promise<never> => {
+const responseErrorInterceptor = (error: AxiosError): Promise<never> => {
   const { response } = error;
 
   if (response) {
@@ -48,10 +49,10 @@ const responseErrorInterceptor = (error: AxiosError<ApiResponse>): Promise<never
         message.error('请求的资源不存在');
         break;
       case 500:
-        message.error(data?.msg || '服务器错误');
+        message.error((data as ApiResponse)?.msg || '服务器错误');
         break;
       default:
-        message.error(data?.msg || '网络错误');
+        message.error((data as ApiResponse)?.msg || '网络错误');
     }
   } else {
     message.error('网络连接失败，请检查网络设置');
@@ -65,16 +66,16 @@ axiosInstance.interceptors.response.use(responseInterceptor, responseErrorInterc
 
 export const api = {
   get: <T = any>(url: string, params?: any): Promise<AxiosResponse<ApiResponse<T>>> => {
-    return axiosInstance.get(url, { params });
+    return axiosInstance.get(url, { params }) as any;
   },
   post: <T = any>(url: string, data?: any): Promise<AxiosResponse<ApiResponse<T>>> => {
-    return axiosInstance.post(url, data);
+    return axiosInstance.post(url, data) as any;
   },
   put: <T = any>(url: string, data?: any): Promise<AxiosResponse<ApiResponse<T>>> => {
-    return axiosInstance.put(url, data);
+    return axiosInstance.put(url, data) as any;
   },
   delete: <T = any>(url: string, params?: any): Promise<AxiosResponse<ApiResponse<T>>> => {
-    return axiosInstance.delete(url, { params });
+    return axiosInstance.delete(url, { params }) as any;
   },
 };
 

@@ -8,12 +8,6 @@ import { paperService } from '../../services/paperService';
 const { Step } = Steps;
 const { Dragger } = Upload;
 
-interface ImportError {
-  row: number;
-  field: string;
-  message: string;
-}
-
 const BatchImportPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -84,9 +78,9 @@ const BatchImportPage: React.FC = () => {
     try {
       const file = fileList[0].originFileObj as File;
       const response = await paperService.batchImport(file);
-      setImportResult(response.data.data);
+      setImportResult(response.data);
       setCurrentStep(2);
-      message.success(`导入完成: 成功 ${response.data.data.success} 条, 失败 ${response.data.data.failed} 条`);
+      message.success(`导入完成: 成功 ${response.data.success} 条, 失败 ${response.data.failed} 条`);
     } catch (error) {
       message.error('导入失败');
       setImportResult({

@@ -19,11 +19,11 @@ import (
 
 // PaperHandler 论文处理器
 type PaperHandler struct {
-	paperService *service.PaperService
+	paperService service.PaperServiceInterface
 }
 
 // NewPaperHandler 创建论文处理器实例
-func NewPaperHandler(paperService *service.PaperService) *PaperHandler {
+func NewPaperHandler(paperService service.PaperServiceInterface) *PaperHandler {
 	return &PaperHandler{
 		paperService: paperService,
 	}
@@ -35,7 +35,7 @@ func (h *PaperHandler) CreatePaper(c *gin.Context) {
 	var req struct {
 		Title        string           `json:"title" binding:"required"`
 		Abstract     string           `json:"abstract"`
-		JournalID    uint             `json:"journal_id" binding:"required"`
+		JournalID    uint             `json:"journal_id"`
 		DOI          string           `json:"doi"`
 		ImpactFactor float64          `json:"impact_factor"`
 		PublishDate  string           `json:"publish_date"`
@@ -46,8 +46,9 @@ func (h *PaperHandler) CreatePaper(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		logger.GetLogger().Warn("Invalid create paper request",
 			zap.Error(err),
+			zap.String("body", c.GetHeader("Content-Type")),
 		)
-		response.Error(c, http.StatusBadRequest, "参数错误")
+		response.Error(c, http.StatusBadRequest, "参数错误: "+err.Error())
 		return
 	}
 

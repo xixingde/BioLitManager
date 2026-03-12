@@ -29,7 +29,7 @@ export const fileService = {
 
   // 下载文件
   downloadFile: (id: number) => {
-    return request.get<{ file_path: string }>(`/files/${id}/download`, {
+    return request.get(`/files/${id}/download`, {
       responseType: 'blob'
     });
   },
