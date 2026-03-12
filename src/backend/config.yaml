@@ -1,0 +1,14 @@
+server:
+  port: "8080"
+  mode: "debug"
+
+database:
+  path: "./data/biolit.db"
+
+jwt:
+  secret: "biolitmanager"
+  expire_hours: 2
+
+cache:
+  session_ttl: "2h"
+  user_info_ttl: "30m"
